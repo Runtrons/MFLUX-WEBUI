@@ -721,6 +721,10 @@ def download_lora_model_huggingface(model_name, hf_api_key):
         print(f"Error: {error_message}")
         return gr.update(), gr.update(), gr.update(), error_message
 
+def update_lora_choices():
+    updated_loras = get_updated_lora_files()
+    return gr.update(choices=updated_loras)
+
 def create_ui():
     with gr.Blocks() as demo:
         with gr.Tabs():
@@ -766,16 +770,22 @@ def create_ui():
                             allow_custom_value=True,
                             value=[]
                         )
+                        refresh_lora_simple = gr.Button("🔄 Refresh LoRAs", scale=0.15)
                         generate_button_simple = gr.Button("Generate Image")
                     
                     with gr.Column():
                         output_image_simple = gr.Image(label="Generated Image")
-                        output_filename_simple = gr.Textbox(label="Saved Image Filename")
+                        output_filename_simple = gr.Textbox(label="Saved Image Filename:")
 
                 enhance_ollama_simple.click(
                     fn=enhance_prompt,
                     inputs=[prompt_simple, ollama_components_simple[0], ollama_components_simple[1]],
                     outputs=prompt_simple
+                )
+                refresh_lora_simple.click(
+                    fn=update_lora_choices,
+                    inputs=[],
+                    outputs=[lora_files_simple]
                 )
                 generate_button_simple.click(
                     fn=simple_generate_image,
@@ -818,11 +828,12 @@ def create_ui():
                             allow_custom_value=True,
                             value=[]
                         )
+                        refresh_lora_advanced = gr.Button("🔄 Refresh LoRAs", scale=0.15)
                         metadata = gr.Checkbox(label="Export Metadata as JSON", value=False)
                         generate_button = gr.Button("Generate Image")
                     with gr.Column():
                         output_image = gr.Image(label="Generated Image")
-                        output_filename = gr.Textbox(label="Saved Image Filename")
+                        output_filename = gr.Textbox(label="Saved Image Filename:")
 
                 model.change(
                     fn=update_guidance_visibility,
@@ -834,6 +845,11 @@ def create_ui():
                     fn=enhance_prompt,
                     inputs=[prompt, ollama_components_adv[0], ollama_components_adv[1]],
                     outputs=prompt
+                )
+                refresh_lora_advanced.click(
+                    fn=update_lora_choices,
+                    inputs=[],
+                    outputs=[lora_files]
                 )
                 generate_button.click(
                     fn=generate_image_gradio,
@@ -878,6 +894,7 @@ def create_ui():
                             allow_custom_value=True,
                             value=[]
                         )
+                        refresh_lora_cn = gr.Button("🔄 Refresh LoRAs", scale=0.15)
                         metadata_cn = gr.Checkbox(label="Export Metadata as JSON", value=False)
                         save_canny = gr.Checkbox(label="Save Canny Edge Detection Image", value=False)
                         generate_button_cn = gr.Button("Generate Image")
@@ -888,6 +905,12 @@ def create_ui():
                     fn=enhance_prompt,
                     inputs=[prompt, ollama_components_cn[0], ollama_components_cn[1]],
                     outputs=prompt_cn
+                )
+                
+                refresh_lora_cn.click(
+                    fn=update_lora_choices,
+                    inputs=[],
+                    outputs=[lora_files_cn]
                 )
                 
                 generate_button_cn.click(
@@ -1058,3 +1081,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
